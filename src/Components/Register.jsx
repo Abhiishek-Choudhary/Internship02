@@ -1,23 +1,39 @@
 import React, { useState } from "react";
+import { saveData } from "../services/api";
 
 function Register({ setRegister }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleClick = (e) => {
-    e.preventDeafult();
+    e.preventDefault();
     setRegister(true);
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async(e) => {
     e.preventDefault();
+
     if (!username || !password) {
-      setError("Please fill all the fields.");
-    } else {
-      setError("");
-      setRegister(true);
+      alert("Please fill all the feilds");
+      return;
     }
+  
+    try{
+       
+      const response = await saveData({username,password});
+     
+      if(response && response.status === 200){
+        setRegister(true);
+      }
+      else{
+        alert("failed to register please try again");
+      }
+    }
+
+    catch(error){
+      console.log(error);
+    }
+
   };
 
   return (
@@ -26,13 +42,13 @@ function Register({ setRegister }) {
         className="border p-2 mt-16"
         type="text"
         placeholder="Enter your name"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
       />
       <input
         className="border p-2 mt-2"
         type="text"
         placeholder="Enter Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
       />
       <input
         className="border p-2 mt-2"
@@ -41,7 +57,6 @@ function Register({ setRegister }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-        {error && <div className='text-red-600 mt-2'>{error}</div>}
       <button
         onClick={handleRegister}
         className="bg-blue-600 p-2 rounded-lg shadow-md mt-4 text-white"
